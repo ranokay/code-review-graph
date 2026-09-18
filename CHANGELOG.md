@@ -43,6 +43,12 @@
 
 ### Fixed
 
+- The OpenCode plugin template is an OpenCode 2.x definition
+  (`Plugin.define` with `id` + `setup`, hooks via `ctx.event.subscribe`
+  and `ctx.tool.hook`, subprocesses via `node:child_process`), so the
+  installed plugin loads on current OpenCode releases instead of failing
+  with `Plugin must export a default definition with an id and an effect
+  or setup function` (#1038).
 - Freshness metadata follows what was stored. A no-op `update` that
   confirms `HEAD` advances the Git anchor, so queries after a commit no
   longer carry a stale-graph caveat, and a file that fails to parse no
