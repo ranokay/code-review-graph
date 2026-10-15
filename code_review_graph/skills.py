@@ -2879,10 +2879,11 @@ def install_hermes_skills(repo_root: Path) -> Path:
 def _opencode_plugin_content() -> str:
     """Return TypeScript source for the OpenCode user-level plugin.
 
-    The plugin is an OpenCode 2.x (V2) definition — ``Plugin.define`` with
-    an ``id`` and a ``setup`` function — because the V2 loader rejects any
-    other default-export shape with ``SchemaError(Expected object at
-    ["default"])``. ``setup`` mirrors the Claude Code hook behaviors:
+    The plugin exports an OpenCode 2.x (V2) definition object with an ``id``
+    and a ``setup`` function because the V2 loader rejects any other
+    default-export shape with ``SchemaError(Expected object at ["default"])``.
+    The plugin package is imported only for types so older 2.x hosts do not
+    need to resolve it at runtime. ``setup`` mirrors the Claude Code hook behaviors:
 
     1. successful ``edit``/``write``/``patch`` tool calls (there is no V2
        ``file.edited`` hook) — runs ``code-review-graph update --skip-flows``
@@ -2899,7 +2900,7 @@ def _opencode_plugin_content() -> str:
     name.
     """
     return """\
-import { Plugin } from "@opencode/plugin"
+import type { Plugin } from "@opencode/plugin"
 import { execFile } from "node:child_process"
 import { promisify } from "node:util"
 
@@ -2927,7 +2928,7 @@ async function runQuiet(args: string[], cwd: string, timeoutMs: number): Promise
   }
 }
 
-export default Plugin.define({
+export default {
   id: "code-review-graph",
   async setup(ctx) {
     const baseDir = ctx.location.directory
@@ -2979,7 +2980,7 @@ export default Plugin.define({
 
     return () => controller.abort()
   },
-})
+} satisfies Parameters<typeof Plugin.define>[0]
 """
 
 

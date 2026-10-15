@@ -2356,8 +2356,9 @@ class TestOpenCodePluginContent:
 
     def test_has_plugin_type_import(self):
         content = _opencode_plugin_content()
-        assert "@opencode/plugin" in content
-        assert "Plugin.define" in content
+        assert 'import type { Plugin } from "@opencode/plugin"' in content
+        assert "satisfies Parameters<typeof Plugin.define>[0]" in content
+        assert "Plugin.define(" not in content
 
     def test_has_default_export(self):
         content = _opencode_plugin_content()
